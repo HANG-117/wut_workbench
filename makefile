@@ -1,8 +1,13 @@
+CSRC := $(shell find csrc -name "*.c")
+
 build:
 	@mkdir -p build
+
 run: build
-	@g++ main.cpp -o build/main
+	@gcc -Wall -I include $(CSRC) -o build/main
 	@./build/main
+
 clean:
 	@rm -rf build
+
 .PHONY: build run clean
