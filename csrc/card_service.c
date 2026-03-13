@@ -5,14 +5,27 @@
 #include <string.h>
 int cardCount = 0;
 Card cardList[MAX_CARD_NUM];
+int is_all_digits(const char* str) {
+    if (str == NULL || *str == '\0') return 0; 
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (!isdigit((unsigned char)str[i])) {
+            return 0;
+        }
+    }
+    return 1;
+}
 void addCard() {
     while(1){
-        printf("请输入卡号");
         char Name[20];
-        scanf("%s", Name);
-        if (strlen(Name) > 18) {
-            printf("卡号长度不能超过18位，请重新输入\n");
-            continue;
+        char Pwd[10];
+        while(1){
+            printf("请输入卡号\n");
+            scanf("%s", Name);
+            if (strlen(Name) > 18) {
+                printf("卡号长度不能超过18位，请重新输入\n");
+                continue;
+            }
+            break;
         }
         int exists = 0;
         for(int i = 0;i<cardCount;i++){
@@ -24,14 +37,21 @@ void addCard() {
         if(exists == 1){
             continue;
         }
-        strcpy(cardList[cardCount].aName, Name);
-        printf("请输入密码");
-        char Pwd[10];
-        scanf("%s", Pwd);
-        if (strlen(Pwd) > 8) {
-            printf("密码长度不能超过8位，请重新输入\n");
-            continue;
+        while(1){
+            strcpy(cardList[cardCount].aName, Name);
+            printf("请输入密码(不能为纯数字)\n");
+            scanf("%s", Pwd);
+            if (strlen(Pwd) > 8) {
+                printf("密码长度不能超过8位，请重新输入\n");
+                continue;
+            }
+            if(is_all_digits(Pwd)) {
+                printf("密码不能为纯数字，请重新输入\n");
+                continue;
+            }
+            break;
         }
+        
         strcpy(cardList[cardCount].aPwd, Pwd);
         cardList[cardCount].nStatus = 0;
         cardList[cardCount].tStart = time(NULL);
