@@ -3,200 +3,208 @@
 #include "global.h"
 #include <stdio.h>
 #include <string.h>
-int cardCount = 0;
-Card cardList[MAX_CARD_NUM];
-int is_all_digits(const char* str) {
-    if (str == NULL || *str == '\0') return 0; 
-    for (int i = 0; str[i] != '\0'; i++) {
-        if (!isdigit((unsigned char)str[i])) {
-            return 0;
+#include <stdlib.h>
+#include <ctype.h>
+#include <assert.h>
+CardList cardList_head = NULL;
+CardList cardList_tail = NULL;
+Card newCard;
+Card creat_card(){
+    while(1){
+        printf("请输入用户名：");
+        scanf("%s",newCard.aName);
+        if(strlen(newCard.aName)>17){
+            printf("用户名过长，请重新输入！\n");
+            continue;
         }
+        CardList current = cardList_head;
+        int exists = 0;
+        while (current != NULL) {
+            if (strcmp(current->data.aName, newCard.aName) == 0)
+            {
+                exists = 1;
+                break;
+            }
+            current = current->next;
+        }
+        if (exists) {
+            printf("用户名已存在，请重新输入！\n");
+            continue;
+        }
+        break;
+    }
+    while(1){
+        printf("请输入密码：(不超过7位且不为纯数字) ");
+        scanf("%s",newCard.aPwd);
+        if(strlen(newCard.aPwd)>7){
+            printf("密码过长，请重新输入！\n");
+            continue;
+        }
+        if(is_digits(newCard.aPwd)){
+            printf("密码不能为纯数字，请重新输入！\n");
+            continue;
+        }
+        break;
+    }
+    newCard.nStatus = 1;
+    newCard.tStart = time(NULL);
+    newCard.tEnd = 0;
+    newCard.fTotalUse = 0.0f;
+    newCard.tLast = 0;
+    newCard.nUseCount = 0;
+    newCard.fBalance = 0.0f;
+    newCard.nDel = 0;
+    printf("卡创建成功！\n");
+    return newCard;
+}
+
+
+int addCard(Card newCard) {
+    printf("正在添加卡...\n");
+    CardNode *newNode = (CardNode*)malloc(sizeof(CardNode));
+    if (newNode == NULL) {
+        return -1;
+    }
+    newNode->data = newCard;
+    newNode->next = NULL;
+    if (cardList_head == NULL) {
+        cardList_head = newNode;
+        cardList_tail = newNode;
+    } else {
+        cardList_tail->next = newNode;
+        cardList_tail = newNode;
     }
     return 1;
 }
-void addCard() {
-    while(1){
-        char Name[20];
-        char Pwd[10];
-        while(1){
-            printf("请输入卡号\n");
-            scanf("%s", Name);
-            if (strlen(Name) > 18) {
-                printf("卡号长度不能超过18位，请重新输入\n");
-                continue;
-            }
-            break;
-        }
-        int exists = 0;
-        for(int i = 0;i<cardCount;i++){
-            if(strcmp(Name, cardList[i].aName) == 0){
-                printf("卡号已存在，请重新输入\n");
-                exists = 1;
-            }
-        }
-        if(exists == 1){
-            continue;
-        }
-        while(1){
-            strcpy(cardList[cardCount].aName, Name);
-            printf("请输入密码(不能为纯数字)\n");
-            scanf("%s", Pwd);
-            if (strlen(Pwd) > 8) {
-                printf("密码长度不能超过8位，请重新输入\n");
-                continue;
-            }
-            if(is_all_digits(Pwd)) {
-                printf("密码不能为纯数字，请重新输入\n");
-                continue;
-            }
-            break;
-        }
-        
-        strcpy(cardList[cardCount].aPwd, Pwd);
-        cardList[cardCount].nStatus = 0;
-        cardList[cardCount].tStart = time(NULL);
-        cardList[cardCount].tEnd = time(NULL) + 365 * 24;
-        cardList[cardCount].fTotalUse = 0.0;
-        cardList[cardCount].tLast = time(NULL);
-        cardList[cardCount].nUseCount = 0;
-        cardList[cardCount].fBalance = 0.0;
-        cardList[cardCount].nDel = 0;
-        cardCount++;
-        printf("卡号：%s 添加成功\n", cardList[cardCount - 1].aName);
-        if (cardCount >= MAX_CARD_NUM) {
-            printf("卡号已满，无法继续添加\n");
-            break;
-        }
 
-        printf("是否继续添加？(y/n)");
-        char choice;
-        scanf(" %c", &choice);
-        if (choice == 'n' || choice == 'N') {
-            break;}
-        else if (choice == 'y' || choice == 'Y') {
-            continue;
+
+int is_digits(const char *str) {
+    while (*str) {
+        if (!isdigit(*str)) {
+            return 0;
         }
-        else {
-            printf("无效输入，默认不再添加\n");
-            break;
-        }
+        str++;
     }
+    return 1;
 }
-void findCard(){
-    char Name[20];
-    while(1){
-        int is_exact = 0;
-        printf("请输入要查询的卡号：");
-        scanf("%s", Name);
-        if (strlen(Name) > 18) {
-            printf("卡号长度不能超过18位，请重新输入\n");
-            continue;
-        }
-        int found = 0;
-        if (strlen(Name) == 18) is_exact = 1;
-        if(is_exact)
-        {
-            Card card_find;
-            for (int i = 0; i < cardCount; i++) {
-                if (strcmp(Name, cardList[i].aName) == 0) {
-                    card_find = cardList[i];
-                    found = 1;
-                    break;
-                }
-            }
-            if (found) {
-                while(1){
-                    printf("请输入密码");
-                    char password[10];
-                    scanf("%s", password);
-                    if (strcmp(password, card_find.aPwd) == 0) {
-                        printf("密码正确\n");
+
+void printCard(const Card *card) {
+    printf("用户：%s\n", card->aName);
+    printf("状态：%s\n", card->nStatus == 0 ? "未上机" : card->nStatus == 1 ? "正在上机" : card->nStatus == 2 ? "已注销" : "失效");
+    printf("余额：%.2f\n", card->fBalance);
+    printf("使用次数：%d\n", card->nUseCount);
+    printf("总使用金额：%.2f\n", card->fTotalUse);
+    printf("最后使用时间：%s", ctime(&card->tLast));
+    printf("注册时间：%s", ctime(&card->tStart));
+    printf("删除标志：%s\n", card->nDel == 0 ? "未删除" : "已删除");
+}
+
+void findcard() {
+    char searchName[18];
+    Card foundCard[100]; // 假设最多有100个匹配的用户
+    printf("请输入要查找的用户名：");
+    scanf("%s", searchName);
+    if(strlen(searchName) > 17){
+        printf("搜索失败（用户名过长）\n");
+        return;
+    }
+    CardList current = cardList_head;
+    int exactfind = (strlen(searchName) == 17);
+    if(exactfind){
+        while (current != NULL) {
+            if (strcmp(current->data.aName, searchName) == 0) {
+                int attemp = 0;
+                while(attemp < 3){
+                    printf("请输入密码:");
+                    char inputPwd[8];
+                    scanf("%s",inputPwd);
+                    if(strcmp(inputPwd,current->data.aPwd) == 0){
+                        printf("密码正确！\n");
                         break;
                     }
-                    else {
-                        printf("密码错误，请重新输入\n");
-                        continue;
+                    else{
+                        printf("密码错误，请重新输入！\n");
+                        attemp++;
+                    }
+                    if (attemp >= 3) {
+                        printf("连续三次密码错误，查询失败！\n");
+                        return;
                     }
                 }
-                printf("卡号：%s\n", card_find.aName);
-                printf("密码：%s\n", card_find.aPwd);
-                printf("状态：%d\n", card_find.nStatus);
-                printf("开始时间：%s", ctime(&card_find.tStart));
-                printf("结束时间：%s", ctime(&card_find.tEnd));
-                printf("总使用金额：%.2f\n", card_find.fTotalUse);
-                printf("上次使用时间：%s", ctime(&card_find.tLast));
-                printf("使用次数：%d\n", card_find.nUseCount);
-                printf("余额：%.2f\n", card_find.fBalance);
-                printf("是否删除：%d\n", card_find.nDel);
+                printCard(&current->data);
+                return;
             }
-            else {
-                printf("未找到该卡号\n");
+            current = current->next;
+        }
+        printf("未找到用户：%s\n", searchName);
+    }
+    else{
+        int count = 0;
+        while (current != NULL) {
+            if (strstr(current->data.aName, searchName) != NULL) {
+                foundCard[count++] = current->data;
+                if (count >= 100) {
+                    break;
+                }
+            }
+            current = current->next;
+        }
+        if (count == 0) {
+            printf("未找到包含 '%s' 的用户\n", searchName);
+        } 
+        else if(count == 1){
+            printf("找到 1 个用户：\n");
+            printf("用户名: %s\n", foundCard[0].aName);
+            char inputPwd[8];
+            int attempt = 0;
+            while (attempt < 3) {
+                printf("请输入密码：");
+                scanf("%s", inputPwd);
+                if (strcmp(inputPwd, foundCard[0].aPwd) == 0) {
+                    printf("密码正确！\n");
+                    printCard(&foundCard[0]);
+                    return;
+                } else {
+                    printf("密码错误，请重新输入！\n");
+                    attempt++;
+                    if(attempt >= 3){
+                        printf("连续三次密码错误，查询失败！\n");
+                        return;
+                    }
+                }
             }
         }
         else {
-            Card cards_find[MAX_CARD_NUM];
-            int count = 0;
-            for (int i = 0; i < cardCount; i++) {
-                if (strstr(cardList[i].aName, Name) != NULL) {
-                    cards_find[count++] = cardList[i];
-                }
+            printf("找到 %d 个用户：\n", count);
+            for (int i = 0; i < count; i++) {
+                printf("用户 %d:\n", i + 1);
+                printf("用户名: %s\n", foundCard[i].aName);
             }
-            if (count > 0) {
-                printf("找到 %d 个匹配的卡号：\n", count);
-                for (int i = 0; i < count; i++) {
-                    printf("卡号：%s\n", cards_find[i].aName);
-                }
-                int index;
-                while(1){
-                    printf("请输入要查询的卡号索引：");
-                    scanf("%d", &index);
-                    if (index >= 0 && index < count) {
-                        printf("卡号：%s\n", cards_find[index].aName);
-                        while(1){
-                            printf("请输入密码");
-                            char password[10];
-                            scanf("%s", password);
-                            if (strcmp(password, cards_find[index].aPwd) == 0) {
-                                printf("密码正确\n");
-                                break;
-                            }
-                            else {
-                                printf("密码错误，请重新输入\n");
-                                continue;
-                            }
+            printf("请输入要查看详情的序号：");
+            int index;
+            scanf("%d", &index);
+            if (index < 1 || index > count) {
+                printf("无效的序号！\n");
+            } else {
+                char inputPwd[8];
+                int attempt = 0;
+                while (attempt < 3) {
+                    printf("请输入密码：");
+                    scanf("%s", inputPwd);
+                    if (strcmp(inputPwd, foundCard[index - 1].aPwd) == 0) {
+                        printf("密码正确！\n");
+                        printCard(&foundCard[index - 1]);
+                        return;
+                    } else {
+                        printf("密码错误，请重新输入！\n");
+                        attempt++;
+                        if(attempt >= 3){
+                            printf("连续三次密码错误，查询失败！\n");
+                            return;
                         }
                     }
-                    else{
-                        printf("索引无效，请重新输入\n");
-                        continue;
-                    }
-                    printf("卡号：%s\n", cards_find[index].aName);
-                    printf("密码：%s\n", cards_find[index].aPwd);
-                    printf("状态：%d\n", cards_find[index].nStatus);
-                    printf("开始时间：%s", ctime(&cards_find[index].tStart));
-                    printf("结束时间：%s", ctime(&cards_find[index].tEnd));
-                    printf("总使用金额：%.2f\n", cards_find[index].fTotalUse);
-                    printf("上次使用时间：%s", ctime(&cards_find[index].tLast));
-                    printf("使用次数：%d\n", cards_find[index].nUseCount);
-                    printf("余额：%.2f\n", cards_find[index].fBalance);
-                    printf("是否删除：%d\n", cards_find[index].nDel);
-                    break;
                 }
-                
             }
-            else {
-                printf("未找到该卡号\n");
-            }
-        }
-        char choice;
-        printf("是否继续查询？(y/n)");
-        scanf(" %c", &choice);
-        if (choice == 'y' || choice == 'Y') {
-            continue;
-        }
-        else{
-            break;
-        }
     }
-        
+}
 }
