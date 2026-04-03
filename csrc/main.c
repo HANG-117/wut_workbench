@@ -1,11 +1,14 @@
 #include"menu.h"
 #include"service.h"
 #include"card_service.h"
+#include"card_file.h"
 #include"global.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+
+int is_read_card = 0;
 
 int main(){
     int choice;

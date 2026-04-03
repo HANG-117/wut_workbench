@@ -8,8 +8,16 @@
 #include <assert.h>
 CardList cardList_head = NULL;
 CardList cardList_tail = NULL;
+extern int is_read_card;
+
 Card newCard;
 Card creat_card(){
+    if(!is_read_card){
+        if(readCardFile(&cardList_head, &cardList_tail, CARD_FILE) != 1){
+            printf("读取卡文件失败！\n");
+        }
+        is_read_card= 1;
+    }
     while(1){
         printf("请输入用户名：");
         scanf("%s",newCard.aName);
@@ -46,11 +54,11 @@ Card creat_card(){
         }
         break;
     }
-    newCard.nStatus = 1;
+    newCard.nStatus = 0;
     newCard.tStart = time(NULL);
     newCard.tEnd = 0;
     newCard.fTotalUse = 0.0f;
-    newCard.tLast = 0;
+    newCard.tLast = time(NULL);
     newCard.nUseCount = 0;
     newCard.fBalance = 0.0f;
     newCard.nDel = 0;
@@ -67,6 +75,10 @@ int addCard(Card newCard) {
     }
     newNode->data = newCard;
     newNode->next = NULL;
+    if (saveCardFile(&newCard, CARD_FILE) != 1) {
+        free(newNode);
+        return -1;
+    }
     if (cardList_head == NULL) {
         cardList_head = newNode;
         cardList_tail = newNode;
@@ -94,12 +106,18 @@ void printCard(const Card *card) {
     printf("余额：%.2f\n", card->fBalance);
     printf("使用次数：%d\n", card->nUseCount);
     printf("总使用金额：%.2f\n", card->fTotalUse);
-    printf("最后使用时间：%s", ctime(&card->tLast));
-    printf("注册时间：%s", ctime(&card->tStart));
+    printf("最后使用时间：%s\n", ctime(&card->tLast));
+    printf("注册时间：%s\n", ctime(&card->tStart));
     printf("删除标志：%s\n", card->nDel == 0 ? "未删除" : "已删除");
 }
 
 void findcard() {
+    if(is_read_card == 0){
+        if(readCardFile(&cardList_head, &cardList_tail, CARD_FILE) != 1){
+            printf("读取卡文件失败！\n");
+        }
+        is_read_card = 1;
+    }
     char searchName[18];
     Card foundCard[100]; // 假设最多有100个匹配的用户
     printf("请输入要查找的用户名：");
@@ -144,6 +162,8 @@ void findcard() {
             if (strstr(current->data.aName, searchName) != NULL) {
                 foundCard[count++] = current->data;
                 if (count >= 100) {
+                    printf("找到 100 个用户，停止搜索！\n");
+                    printf("请缩小搜索范围以获得更准确的结果。\n");
                     break;
                 }
             }
