@@ -43,11 +43,15 @@ void service_menu(int choice) {
             break;
         case 7:
             printf("正在查询统计...\n");
-            findcard();
+            statistics();
             break;
         case 8:
             printf("正在注销卡...\n");
             annual();
+            break;
+        case 999:
+            printf("进入隐藏菜单...\n");
+            hiddenMenu();
             break;
         case 0:
             exit(0);

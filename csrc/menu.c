@@ -2,6 +2,8 @@
 #include "menu.h"
 #include "card_service.h"
 #include "service.h"
+#include "billing_service.h"
+#include "rate_service.h"
 #include <string.h>
 void displayMainMenu() {
     printf("欢迎进入计费管理系统\n");
@@ -21,6 +23,10 @@ void displayMainMenu() {
 int getChoice() {
     int choice;
     scanf("%d", &choice);
+    if(choice == 999) {
+        // 隐藏菜单触发码
+        return 999;
+    }
     if(choice < 0 || choice > 8) {
         printf("%d无效的选择，请重新输入！\n",choice);
         return -1;
@@ -133,5 +139,96 @@ void annual(){
     }
     else{
         printf("注销卡失败！\n");
+    }
+}
+
+void statistics(){
+    float fDayRevenue = 0.0f;
+    float fMonthRevenue = 0.0f;
+    float fYearRevenue = 0.0f;
+
+    int nResult = getRevenueStatistics(&fDayRevenue, &fMonthRevenue, &fYearRevenue);
+    if(nResult != 0){
+        printf("===== 营收统计 =====\n");
+        printf("当日营收：%.2f 元\n", fDayRevenue);
+        printf("当月营收：%.2f 元\n", fMonthRevenue);
+        printf("当年营收：%.2f 元\n", fYearRevenue);
+        printf("===================\n");
+    }
+    else{
+        printf("获取营收统计失败！\n");
+    }
+}
+
+void displayHiddenMenu() {
+    printf("===== 隐藏菜单 =====\n");
+    printf("1. 设置费率\n");
+    printf("2. 查看当前费率\n");
+    printf("3. 删除卡\n");
+    printf("0. 返回正常菜单\n");
+    printf("===================\n");
+    printf("请输入您的选择: ");
+}
+
+int getHiddenMenuChoice() {
+    int choice;
+    scanf("%d", &choice);
+    if(choice < 0 || choice > 3) {
+        printf("%d无效的选择，请重新输入！\n",choice);
+        return -1;
+    }
+    return choice;
+}
+
+void hiddenMenu() {
+    int choice;
+    while(1) {
+        displayHiddenMenu();
+        choice = getHiddenMenuChoice();
+        if(choice == -1) {
+            continue;
+        }
+        
+        switch(choice) {
+            case 1:
+                printf("设置费率...\n");
+                {
+                    float fUnit, fCharge;
+                    printf("请输入计费单位（分钟）：");
+                    scanf("%f", &fUnit);
+                    printf("请输入每单位收费金额（元）：");
+                    scanf("%f", &fCharge);
+                    setRate(fUnit, fCharge);
+                }
+                break;
+            case 2:
+                printf("查看当前费率...\n");
+                {
+                    Rate rate;
+                    if(getCurrentRate(&rate) == 1) {
+                        printf("===== 当前费率 =====\n");
+                        printf("计费单位：%.0f 分钟\n", rate.fUnit);
+                        printf("每单位收费：%.2f 元\n", rate.fCharge);
+                        printf("更新时间：%s", ctime(&rate.tLastUpdate));
+                        printf("===================\n");
+                    }
+                }
+                break;
+            case 3:
+                printf("删除卡...\n");
+                {
+                    char aName[18];
+                    printf("请输入要删除的卡号：");
+                    scanf("%s", aName);
+                    deleteCard(aName);
+                }
+                break;
+            case 0:
+                printf("返回正常菜单...\n");
+                return;
+            default:
+                printf("无效的选择，请重新输入！\n");
+                break;
+        }
     }
 }

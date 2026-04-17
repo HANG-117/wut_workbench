@@ -18,4 +18,5 @@
     int addCard(Card newCard);    
     void findcard();
     Card* check_card(const char* aName, const char* aPwd);
+    int deleteCard(const char* pName);
 #endif

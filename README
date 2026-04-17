@@ -22,6 +22,8 @@ wut_workbench/
 │   ├── billing_service.c # 计费服务模块
 │   ├── card_file.c   # 卡片文件操作模块
 │   └── card_service.c # 卡片服务模块
+|   └── money_service.c       # 货币模块，处理货币计算
+|   └── money_file.c         # 货币文件操作模块
 ├── include/          # 头文件目录
 │   ├── global.h      # 全局定义和宏
 │   ├── model.h       # 数据模型定义
@@ -32,11 +34,14 @@ wut_workbench/
 │   ├── billing_service.h # 计费服务头文件
 │   ├── card_file.h   # 卡片文件头文件
 │   └── card_service.h # 卡片服务头文件
+|   └── money_service.h       # 货币服务头文件
+|   └── money_file.h         # 货币文件头文件
+|
 ├── data/             # 数据文件目录
 │   ├── biling.ams    # 计费数据文件
-│   ├── card.txt      # 卡片数据文件
+│   ├── card.ams      # 卡片数据文件
 │   ├── rate.ams      # 费率数据文件
-│   └── record.txt    # 记录数据文件
+│   
 └── tests/            # 测试目录（目前为空）
 ```
 
@@ -66,6 +71,7 @@ wut_workbench/
    ```
 3. 直接运行:
     ```
+    cd wut_workbench
     make run
     ```
 ### 依赖
@@ -73,6 +79,6 @@ wut_workbench/
 - Linux环境
 
 ### 开发环境
-- 操作系统：Linux
-- 编程语言：C
+- 操作系统：Linux Ubuntu 22.04
+- 编程语言：C makefile
 - 构建工具：make

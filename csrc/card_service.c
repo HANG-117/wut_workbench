@@ -269,3 +269,68 @@ Card* check_card(const char* aName, const char* aPwd){
         return NULL;
     }
 }
+
+int deleteCard(const char* pName)
+{
+    CardList current = cardList_head;
+    CardList prev = NULL;
+    int found = 0;
+    
+    while(current != NULL)
+    {
+        if(strcmp(current->data.aName, pName) == 0)
+        {
+            found = 1;
+            break;
+        }
+        prev = current;
+        current = current->next;
+    }
+    
+    if(found == 0)
+    {
+        printf("未找到用户：%s\n", pName);
+        return 0;
+    }
+    
+    // 检查卡片状态
+    if(current->data.nStatus == CARD_ON_COMPUTER)
+    {
+        printf("用户正在上机，无法删除！\n");
+        return 0;
+    }
+    
+    // 将卡片标记为已删除
+    current->data.nDel = CARD_NO_EXIST;
+    
+    // 保存到文件
+    if(saveAllCards(cardList_head, CARD_PATH) != 1)
+    {
+        printf("删除卡片失败：保存文件错误！\n");
+        current->data.nDel = CARD_EXIST; // 恢复状态
+        return 0;
+    }
+    
+    // 从链表中移除
+    if(prev == NULL)
+    {
+        // 删除的是头节点
+        cardList_head = current->next;
+        if(cardList_head == NULL)
+        {
+            cardList_tail = NULL;
+        }
+    }
+    else
+    {
+        prev->next = current->next;
+        if(prev->next == NULL)
+        {
+            cardList_tail = prev;
+        }
+    }
+    
+    free(current);
+    printf("卡片删除成功！\n");
+    return 1;
+}

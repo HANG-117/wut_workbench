@@ -18,5 +18,6 @@
 
 #define CARD_PATH "data/card.ams"
 #define MONEY_PATH "data/money.ams"
+#define RATE_PATH "data/rate.ams"
 
 #endif

@@ -18,6 +18,11 @@ int readCardBinary(CardList *head,CardList *tail, const char *filename){
     }
     Card card;
     while (fread(&card, sizeof(Card), 1, file) == 1) {
+        // 跳过已删除的卡片
+        if (card.nDel == CARD_NO_EXIST) {
+            continue;
+        }
+        
         CardNode *newNode = (CardNode*)malloc(sizeof(CardNode));
         if (newNode == NULL) {
             fclose(file);

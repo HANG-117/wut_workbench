@@ -8,4 +8,8 @@ void settle();
 void addMoney();
 void refundMoney();
 void annual();
+void statistics();
+void displayHiddenMenu();
+int getHiddenMenuChoice();
+void hiddenMenu();
 #endif

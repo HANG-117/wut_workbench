@@ -7,4 +7,5 @@
     void releaseBillingList();
     int getBilling();
     Billing* queryBilling(const char* pName, int* pIndex);
+int getRevenueStatistics(float* fDayRevenue, float* fMonthRevenue, float* fYearRevenue);
 #endif

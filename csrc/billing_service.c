@@ -89,3 +89,62 @@ Billing* queryBilling(const char* pName, int* pIndex)
     }
     return NULL;
 }
+
+int getRevenueStatistics(float* fDayRevenue, float* fMonthRevenue, float* fYearRevenue)
+{
+    // 初始化计费列表
+    initBillingList();
+    if(getBilling() == FALSE)
+    {
+        releaseBillingList();
+        return FALSE;
+    }
+
+    // 获取当前时间
+    time_t tNow = time(NULL);
+    struct tm* tmNow = localtime(&tNow);
+    int nCurrentYear = tmNow->tm_year + 1900;
+    int nCurrentMonth = tmNow->tm_mon + 1;
+    int nCurrentDay = tmNow->tm_mday;
+
+    // 初始化统计值
+    *fDayRevenue = 0.0f;
+    *fMonthRevenue = 0.0f;
+    *fYearRevenue = 0.0f;
+
+    // 遍历计费记录
+    BillingList current = billingList_head;
+    while(current != NULL)
+    {
+        // 只统计已结算的记录
+        if(current->data.nStatus == SETTLE_BILLING)
+        {
+            struct tm* tmEnd = localtime(&current->data.tEnd);
+            int nYear = tmEnd->tm_year + 1900;
+            int nMonth = tmEnd->tm_mon + 1;
+            int nDay = tmEnd->tm_mday;
+
+            // 统计当年营收
+            if(nYear == nCurrentYear)
+            {
+                *fYearRevenue += current->data.fAmount;
+
+                // 统计当月营收
+                if(nMonth == nCurrentMonth)
+                {
+                    *fMonthRevenue += current->data.fAmount;
+
+                    // 统计当日营收
+                    if(nDay == nCurrentDay)
+                    {
+                        *fDayRevenue += current->data.fAmount;
+                    }
+                }
+            }
+        }
+        current = current->next;
+    }
+
+    releaseBillingList();
+    return TRUE;
+}

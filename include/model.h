@@ -71,4 +71,11 @@ typedef struct MoneyInfo
     float fBalance;
 } MoneyInfo;
 
+typedef struct Rate
+{
+    float fUnit;  // 计费单位（分钟）
+    float fCharge; // 每单位收费金额
+    time_t tLastUpdate; // 最后更新时间
+} Rate;
+
 #endif
