@@ -11,7 +11,7 @@ extern CardList cardList_head;
 extern CardList cardList_tail;
 
 int main(){
-    readCardFile(&cardList_head, &cardList_tail, CARD_FILE);
+    readCardBinary(&cardList_head, &cardList_tail, CARD_PATH);
     int choice;
     while(1){
         static int count = 0;

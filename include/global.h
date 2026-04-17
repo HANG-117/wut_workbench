@@ -13,4 +13,10 @@
 #define UNIT 15
 #define CHARGE 0.5
 
+#define MONEY_ADD 0 // 充值
+#define MONEY_REFUND 1 // 退费
+
+#define CARD_PATH "data/card.ams"
+#define MONEY_PATH "data/money.ams"
+
 #endif

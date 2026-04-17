@@ -4,4 +4,7 @@
 void displayMainMenu();
 int getChoice();
 void logon();
+void settle();
+void addMoney();
+void refundMoney();
 #endif

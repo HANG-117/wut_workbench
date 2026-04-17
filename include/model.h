@@ -8,6 +8,15 @@ typedef struct LogonInfo
     float fBalance;
 }LogonInfo;
 
+typedef struct SettleInfo
+{
+    char aCardName[18];
+    float fAmount;
+    float fBalance;
+    time_t tStart;
+    time_t tEnd;
+}SettleInfo;
+
 typedef struct Billing
 {
     char aCardName[18];
@@ -38,5 +47,20 @@ typedef struct BillingNode {
     Billing data;
     struct BillingNode* next;
 } BillingNode,*BillingList;
+
+typedef struct Money
+{
+    char aCardName[18];
+    float fAmount;
+    int nStatus; // 0-充值 1-退费
+    time_t tTime;
+} Money;
+
+typedef struct MoneyInfo
+{
+    char aCardName[18];
+    float fAmount;
+    float fBalance;
+} MoneyInfo;
 
 #endif

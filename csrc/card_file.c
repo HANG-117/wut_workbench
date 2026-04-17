@@ -2,27 +2,22 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-int saveCardFile(const Card *card, const char *filename) {
-    FILE *file = fopen(filename, "a");
-    if (!file) {
-        return -1;
-    }
-    fprintf(file, "%s##%s##%d##%ld##%ld##%.2f##%ld##%d##%.2f##%d\n",
-            card->aName, card->aPwd, card->nStatus, card->tStart, card->tEnd,
-            card->fTotalUse, card->tLast, card->nUseCount, card->fBalance, card->nDel);
-    fclose(file);
+#include <string.h>
+
+// 保存所有卡片到文件（整存）
+int saveCardBinary(const Card *card, const char *filename){
+    // 这个函数不再使用，改为使用 saveAllCards
     return 1;
 }
 
-int readCardFile(CardList *head,CardList *tail, const char *filename) {
-    FILE *file = fopen(filename, "r");
+// 读取所有卡片到链表
+int readCardBinary(CardList *head,CardList *tail, const char *filename){
+    FILE *file = fopen(filename, "rb");
     if (!file) {
         return -1;
     }
     Card card;
-    while (fscanf(file, "%[^#]##%[^#]##%d##%ld##%ld##%f##%ld##%d##%f##%d\n",
-                  card.aName, card.aPwd, &card.nStatus, &card.tStart, &card.tEnd,
-                  &card.fTotalUse, &card.tLast, &card.nUseCount, &card.fBalance, &card.nDel) == 10) {
+    while (fread(&card, sizeof(Card), 1, file) == 1) {
         CardNode *newNode = (CardNode*)malloc(sizeof(CardNode));
         if (newNode == NULL) {
             fclose(file);
@@ -41,37 +36,26 @@ int readCardFile(CardList *head,CardList *tail, const char *filename) {
     fclose(file);
     return 1;
 }
-int updateCardFile(const Card *card, const char *filename,int nIndex){
-    FILE *file = fopen(filename, "r");
+
+// 更新单个卡片（整存整取）
+int updateCardBinary(const Card *card, const char *filename, int nIndex){
+    // 这个函数不再使用，改为使用 saveAllCards
+    return 1;
+}
+
+// 保存所有卡片到文件（整存）
+int saveAllCards(CardList head, const char *filename){
+    FILE *file = fopen(filename, "wb");
     if (!file) {
         return -1;
     }
-    Card cards[MAX_CARDS]; // 假设最多有100张卡
-    int count = 0;
-    while (fscanf(file, "%[^#]##%[^#]##%d##%ld##%ld##%f##%ld##%d##%f##%d\n",
-                  cards[count].aName, cards[count].aPwd, &cards[count].nStatus, &cards[count].tStart, &cards[count].tEnd,
-                  &cards[count].fTotalUse, &cards[count].tLast, &cards[count].nUseCount, &cards[count].fBalance, &cards[count].nDel) == 10) {
-        count++;
-        if(count >= MAX_CARDS){
-            printf("卡数量超过%d，无法更新文件！\n", MAX_CARDS);
+    CardList current = head;
+    while (current != NULL) {
+        if (fwrite(&current->data, sizeof(Card), 1, file) != 1) {
             fclose(file);
             return -1;
         }
-    }
-    fclose(file);
-    if(nIndex < 1 || nIndex > count){
-        printf("索引超出范围，无法更新文件！\n");
-        return -1;
-    }
-    cards[nIndex - 1] = *card; // 更新指定索引的卡信息
-    file = fopen(filename, "w");
-    if (!file) {
-        return -1;
-    }
-    for(int i = 0; i < count; i++){
-        fprintf(file, "%s##%s##%d##%ld##%ld##%.2f##%ld##%d##%.2f##%d\n",
-                cards[i].aName, cards[i].aPwd, cards[i].nStatus, cards[i].tStart, cards[i].tEnd,
-                cards[i].fTotalUse, cards[i].tLast, cards[i].nUseCount, cards[i].fBalance, cards[i].nDel);
+        current = current->next;
     }
     fclose(file);
     return 1;

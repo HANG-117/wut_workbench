@@ -69,16 +69,18 @@ int addCard(Card newCard) {
     }
     newNode->data = newCard;
     newNode->next = NULL;
-    if (saveCardFile(&newCard, CARD_FILE) != 1) {
-        free(newNode);
-        return -1;
-    }
+    // 先添加到链表
     if (cardList_head == NULL) {
         cardList_head = newNode;
         cardList_tail = newNode;
     } else {
         cardList_tail->next = newNode;
         cardList_tail = newNode;
+    }
+    // 保存所有卡片到文件
+    if (saveAllCards(cardList_head, CARD_PATH) != 1) {
+        free(newNode);
+        return -1;
     }
     return 1;
 }
@@ -244,7 +246,6 @@ Card* check_card(const char* aName, const char* aPwd){
                 else{
                     current->data.nStatus = CARD_ON_COMPUTER;
                     current->data.tLast = time(NULL);
-                    nIndex++;
                     find = 1;
                     break;
                 }
@@ -261,7 +262,7 @@ Card* check_card(const char* aName, const char* aPwd){
         printf("未找到用户！\n");
         return NULL;
     }
-    if(TRUE == updateCardFile(&current ->data, CARD_FILE , nIndex)){
+    if(TRUE == saveAllCards(cardList_head, CARD_PATH)){
         return &current ->data;
     }
     else{
