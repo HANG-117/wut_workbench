@@ -114,3 +114,24 @@ void refundMoney(){
         printf("退费失败！\n");
     }
 }
+
+void annual(){
+    AnnulInfo annulInfo;
+    char aName[18];
+    char aPwd[8];
+    printf("请输入卡号：");
+    scanf("%s", aName);
+    printf("请输入密码：");
+    scanf("%s", aPwd);
+
+    int nResult = annualCard(aName, aPwd, &annulInfo);
+    if(nResult != 0){
+        printf("注销卡成功！\n");
+        printf("卡号：%s\n", annulInfo.aCardName);
+        printf("退费金额：%.2f\n", annulInfo.fRefund);
+        printf("注销时间：%s", ctime(&annulInfo.tAnnul));
+    }
+    else{
+        printf("注销卡失败！\n");
+    }
+}

@@ -41,6 +41,14 @@ void service_menu(int choice) {
             printf("正在退费...\n");
             refundMoney();
             break;
+        case 7:
+            printf("正在查询统计...\n");
+            findcard();
+            break;
+        case 8:
+            printf("正在注销卡...\n");
+            annual();
+            break;
         case 0:
             exit(0);
         default:
@@ -344,6 +352,80 @@ int doRefundMoney(const char* pName, const char* pPwd, MoneyInfo* pMoneyInfo)
     strcpy(pMoneyInfo->aCardName, pCard->aName);
     pMoneyInfo->fAmount = money.fAmount;
     pMoneyInfo->fBalance = pCard->fBalance;
+
+    return TRUE;
+}
+
+int annualCard(const char* pName, const char* pPwd, AnnulInfo* pAnnulInfo)
+{
+    // 查找卡片
+    CardList current = cardList_head;
+    Card* pCard = NULL;
+
+    while(current != NULL)
+    {
+        if(strcmp(current->data.aName, pName) == 0)
+        {
+            if(strcmp(current->data.aPwd, pPwd) == 0)
+            {
+                if(current->data.nStatus == CARD_DEL)
+                {
+                    printf("用户已注销，无法再次注销！\n");
+                    return FALSE;
+                }
+                else if(current->data.nStatus == CARD_INVALID)
+                {
+                    printf("用户已失效，无法注销！\n");
+                    return FALSE;
+                }
+                else if(current->data.nStatus == CARD_ON_COMPUTER)
+                {
+                    printf("用户正在上机，无法注销！\n");
+                    return FALSE;
+                }
+                pCard = &current->data;
+                break;
+            }
+            else
+            {
+                printf("密码错误！\n");
+                return FALSE;
+            }
+        }
+        current = current->next;
+    }
+
+    if(pCard == NULL)
+    {
+        printf("未找到用户！\n");
+        return FALSE;
+    }
+
+    // 保存退费信息
+    Money money;
+    strcpy(money.aCardName, pCard->aName);
+    money.fAmount = pCard->fBalance;
+    money.nStatus = MONEY_REFUND;
+    money.tTime = time(NULL);
+
+    if(saveMoney(&money, MONEY_PATH) == FALSE)
+    {
+        printf("保存退费记录失败！\n");
+        return FALSE;
+    }
+
+    // 更新卡片信息
+    pCard->nStatus = CARD_DEL;
+    pCard->tLast = time(NULL);
+
+    // 更新文件
+    saveAllCards(cardList_head, CARD_PATH);
+
+    // 保存注销信息
+    strcpy(pAnnulInfo->aCardName, pCard->aName);
+    pAnnulInfo->fRefund = money.fAmount;
+    pAnnulInfo->fBalance = 0;
+    pAnnulInfo->tAnnul = time(NULL);
 
     return TRUE;
 }

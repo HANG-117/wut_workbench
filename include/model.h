@@ -17,6 +17,14 @@ typedef struct SettleInfo
     time_t tEnd;
 }SettleInfo;
 
+typedef struct AnnulInfo
+{
+    char aCardName[18];
+    float fRefund;
+    float fBalance;
+    time_t tAnnul;
+}AnnulInfo;
+
 typedef struct Billing
 {
     char aCardName[18];

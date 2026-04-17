@@ -7,4 +7,5 @@ void logon();
 void settle();
 void addMoney();
 void refundMoney();
+void annual();
 #endif
