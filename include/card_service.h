@@ -1,27 +1,21 @@
 #ifndef CARD_SERVICE_H
 #define CARD_SERVICE_H
     #include "global.h"
+    #include "model.h"
     #include <stdio.h>
     #include <string.h>
     #include <time.h>
-    typedef struct Card {
-        char aName[18]; // 用户名，最多17个字符 + 1个结束符
-        char aPwd[8]; // 密码，最多7个字符 + 1个结束符
-        int nStatus; // 0-未上机 1-正在上机 2-已注销 3-失效
-        time_t tStart; // 注册时间
-        time_t tEnd; // 截止时间
-        float fTotalUse; // 总使用金额
-        time_t tLast;    // 最后使用时间
-        int nUseCount; // 使用次数
-        float fBalance; // 余额
-        int nDel;   // 删除标志，0表示未删除，1表示已删除
-    } Card;
-    typedef struct CardNode {
-        Card data;
-        struct CardNode* next;
-    } CardNode,*CardList;
-    
+    #define CARD_NOT_ON_COMPUTER 0
+    #define CARD_ON_COMPUTER 1
+    #define CARD_DEL 2
+    #define CARD_INVALID 3
+
+    #define CARD_EXIST 0
+    #define CARD_NO_EXIST 1
+
+   
     Card creat_card();
     int addCard(Card newCard);    
     void findcard();
+    Card* check_card(const char* aName, const char* aPwd);
 #endif

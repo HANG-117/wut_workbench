@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include "menu.h"
+#include "card_service.h"
+#include "service.h"
 void displayMainMenu() {
     printf("欢迎进入计费管理系统\n");
     printf("======菜单======\n");
@@ -18,51 +20,23 @@ void displayMainMenu() {
 int getChoice() {
     int choice;
     scanf("%d", &choice);
+    if(choice < 0 || choice > 8) {
+        printf("%d无效的选择，请重新输入！\n",choice);
+        return -1;
+    }
     return choice;
 }
-int distinguishchoice(int choice) {
-    int cor = 0;
-    switch(choice) {
-        case 1:
-            printf("添加卡片功能\n");
-            cor = 1;
-            break;
-        case 2:
-            printf("查询卡片功能\n");
-            cor = 2;
-            break;
-        case 3:
-            printf("上机功能\n");
-            cor = 3;
-            break;
-        case 4:
-            printf("下机功能\n");
-            cor = 4;
-            break;
-        case 5:
-            printf("充值功能\n");
-            cor = 5;
-            break;
-        case 6:
-            printf("退费功能\n");
-            cor = 6;
-            break;
-        case 7:
-            printf("查询统计功能\n");
-            cor = 7;
-            break;
-        case 8:
-            printf("注销卡功能\n");
-            cor = 8;
-            break;
-        case 0:
-            printf("退出程序\n");
-            cor =-1;
-            break;
-        default:
-            printf("非法输入，请重新输入。\n");
-            cor = 0;
-            break;
+void logon(){
+    LogonInfo logonInfo;
+    Billing billing;
+    int nResult = dologon(&billing,&logonInfo);
+    if(nResult != 0){
+        printf("上机成功！\n");
+        printf("卡号：%s\n",logonInfo.aCardName);
+        printf("余额：%.2f\n",logonInfo.fBalance);
+        printf("上机时间：%s\n",ctime(&logonInfo.tLogon));        
     }
-    return cor; 
+    else{
+        printf("上机失败！\n");
+    }
 }

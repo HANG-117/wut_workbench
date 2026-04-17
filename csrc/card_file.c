@@ -41,3 +41,38 @@ int readCardFile(CardList *head,CardList *tail, const char *filename) {
     fclose(file);
     return 1;
 }
+int updateCardFile(const Card *card, const char *filename,int nIndex){
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        return -1;
+    }
+    Card cards[MAX_CARDS]; // 假设最多有100张卡
+    int count = 0;
+    while (fscanf(file, "%[^#]##%[^#]##%d##%ld##%ld##%f##%ld##%d##%f##%d\n",
+                  cards[count].aName, cards[count].aPwd, &cards[count].nStatus, &cards[count].tStart, &cards[count].tEnd,
+                  &cards[count].fTotalUse, &cards[count].tLast, &cards[count].nUseCount, &cards[count].fBalance, &cards[count].nDel) == 10) {
+        count++;
+        if(count >= MAX_CARDS){
+            printf("卡数量超过%d，无法更新文件！\n", MAX_CARDS);
+            fclose(file);
+            return -1;
+        }
+    }
+    fclose(file);
+    if(nIndex < 1 || nIndex > count){
+        printf("索引超出范围，无法更新文件！\n");
+        return -1;
+    }
+    cards[nIndex - 1] = *card; // 更新指定索引的卡信息
+    file = fopen(filename, "w");
+    if (!file) {
+        return -1;
+    }
+    for(int i = 0; i < count; i++){
+        fprintf(file, "%s##%s##%d##%ld##%ld##%.2f##%ld##%d##%.2f##%d\n",
+                cards[i].aName, cards[i].aPwd, cards[i].nStatus, cards[i].tStart, cards[i].tEnd,
+                cards[i].fTotalUse, cards[i].tLast, cards[i].nUseCount, cards[i].fBalance, cards[i].nDel);
+    }
+    fclose(file);
+    return 1;
+}

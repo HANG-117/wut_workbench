@@ -3,6 +3,5 @@
 
 void displayMainMenu();
 int getChoice();
-int distinguishchoice(int choice);
-
+void logon();
 #endif

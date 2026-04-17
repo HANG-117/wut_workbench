@@ -8,16 +8,10 @@
 #include <assert.h>
 CardList cardList_head = NULL;
 CardList cardList_tail = NULL;
-extern int is_read_card;
 
 Card newCard;
 Card creat_card(){
-    if(!is_read_card){
-        if(readCardFile(&cardList_head, &cardList_tail, CARD_FILE) != 1){
-            printf("读取卡文件失败！\n");
-        }
-        is_read_card= 1;
-    }
+    
     while(1){
         printf("请输入用户名：");
         scanf("%s",newCard.aName);
@@ -54,14 +48,14 @@ Card creat_card(){
         }
         break;
     }
-    newCard.nStatus = 0;
+    newCard.nStatus = CARD_NOT_ON_COMPUTER;
     newCard.tStart = time(NULL);
     newCard.tEnd = 0;
     newCard.fTotalUse = 0.0f;
     newCard.tLast = time(NULL);
     newCard.nUseCount = 0;
     newCard.fBalance = 0.0f;
-    newCard.nDel = 0;
+    newCard.nDel = CARD_EXIST;
     printf("卡创建成功！\n");
     return newCard;
 }
@@ -102,22 +96,17 @@ int is_digits(const char *str) {
 
 void printCard(const Card *card) {
     printf("用户：%s\n", card->aName);
-    printf("状态：%s\n", card->nStatus == 0 ? "未上机" : card->nStatus == 1 ? "正在上机" : card->nStatus == 2 ? "已注销" : "失效");
+    printf("状态：%s\n", card->nStatus == CARD_NOT_ON_COMPUTER ? "未上机" : card->nStatus == CARD_ON_COMPUTER ? "正在上机" : card->nStatus == CARD_DEL ? "已注销" : card->nStatus == CARD_INVALID ? "失效" : "未知");
     printf("余额：%.2f\n", card->fBalance);
     printf("使用次数：%d\n", card->nUseCount);
     printf("总使用金额：%.2f\n", card->fTotalUse);
     printf("最后使用时间：%s\n", ctime(&card->tLast));
     printf("注册时间：%s\n", ctime(&card->tStart));
-    printf("删除标志：%s\n", card->nDel == 0 ? "未删除" : "已删除");
+    printf("删除标志：%s\n", card->nDel == CARD_EXIST ? "未删除" : card->nDel == CARD_NO_EXIST ? "已删除" : "未知");
 }
 
 void findcard() {
-    if(is_read_card == 0){
-        if(readCardFile(&cardList_head, &cardList_tail, CARD_FILE) != 1){
-            printf("读取卡文件失败！\n");
-        }
-        is_read_card = 1;
-    }
+    
     char searchName[18];
     Card foundCard[100]; // 假设最多有100个匹配的用户
     printf("请输入要查找的用户名：");
@@ -225,6 +214,57 @@ void findcard() {
                     }
                 }
             }
+      }
     }
 }
+
+Card* check_card(const char* aName, const char* aPwd){
+    CardList current = cardList_head;
+    int nIndex = 0;
+    int find = 0;
+    while(current != NULL){
+        if(strcmp(current->data.aName, aName) == 0){
+            if(strcmp(current->data.aPwd, aPwd) == 0){
+                if(current->data.nStatus == CARD_ON_COMPUTER){
+                    printf("用户已在上机状态，无法重复上机！\n");
+                    return NULL;
+                }
+                else if(current->data.nStatus == CARD_DEL){
+                    printf("用户已注销，无法上机！\n");
+                    return NULL;
+                }
+                else if(current->data.nStatus == CARD_INVALID){
+                    printf("用户已失效，无法上机！\n");
+                    return NULL;
+                }
+                else if(current->data.fBalance <2){
+                    printf("余额不足2元，无法上机！\n");
+                    return NULL;
+                }
+                else{
+                    current->data.nStatus = CARD_ON_COMPUTER;
+                    current->data.tLast = time(NULL);
+                    nIndex++;
+                    find = 1;
+                    break;
+                }
+            }
+            else{
+                printf("密码错误！\n");
+                return NULL;
+            }
+        }
+        current = current -> next;
+        nIndex++;
+    }
+    if(FALSE == find){
+        printf("未找到用户！\n");
+        return NULL;
+    }
+    if(TRUE == updateCardFile(&current ->data, CARD_FILE , nIndex)){
+        return &current ->data;
+    }
+    else{
+        return NULL;
+    }
 }

@@ -7,31 +7,27 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
-int is_read_card = 0;
+extern CardList cardList_head;
+extern CardList cardList_tail;
 
 int main(){
+    readCardFile(&cardList_head, &cardList_tail, CARD_FILE);
     int choice;
     while(1){
         static int count = 0;
-        displayMainMenu();
-        choice = getChoice();
         count++;
         if(count > 100) {
             printf("程序已运行超过100次，自动退出。\n");
             break;
         }
-        choice = distinguishchoice(choice);
+        displayMainMenu();
+        choice = getChoice();
         if(choice == -1) {
-            exit(0);
+            printf("无效的选择，请重新输入！\n");
+            continue;
         }
-        else if(choice == 0) {
-           continue;
-        }
-        else if(choice >= 1) {
-            service_menu(choice);
-        }
-
+       
+        service_menu(choice);
     }
     return 0;
 }
