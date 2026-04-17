@@ -24,6 +24,8 @@ wut_workbench/
 │   └── card_service.c # 卡片服务模块
 |   └── money_service.c       # 货币模块，处理货币计算
 |   └── money_file.c         # 货币文件操作模块
+|   └── rate_file.c         # 费率文件操作模块
+|   └── rate_service.c       # 费率服务模块
 ├── include/          # 头文件目录
 │   ├── global.h      # 全局定义和宏
 │   ├── model.h       # 数据模型定义
@@ -36,7 +38,8 @@ wut_workbench/
 │   └── card_service.h # 卡片服务头文件
 |   └── money_service.h       # 货币服务头文件
 |   └── money_file.h         # 货币文件头文件
-|
+|   └── rate_file.h         # 费率文件头文件
+|   └── rate_service.h       # 费率服务头文件
 ├── data/             # 数据文件目录
 │   ├── biling.ams    # 计费数据文件
 │   ├── card.ams      # 卡片数据文件
@@ -55,7 +58,6 @@ wut_workbench/
 #### 功能模块
 - **计费模块** (billing_*.c/h): 处理计费相关的文件操作和服务逻辑。
 - **卡片模块** (card_*.c/h): 管理卡片信息的文件操作和服务。
-- **工具模块** (tool.c/h): 提供通用的辅助函数，如字符串处理、文件操作等。
 
 #### 数据层
 - **data/**: 存储应用程序运行所需的数据文件，包括计费记录、卡片信息、费率设置等。
