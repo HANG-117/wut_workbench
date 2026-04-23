@@ -78,7 +78,7 @@ wut_workbench/
     ```
 ### 依赖
 - GCC编译器
-- Linux环境
+- Linux环境 Ubuntu 22.04
 
 ### 开发环境
 - 操作系统：Linux Ubuntu 22.04
