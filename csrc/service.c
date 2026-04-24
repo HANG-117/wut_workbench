@@ -102,17 +102,19 @@ double getAmount(time_t tStart)
 {
     time_t tEnd = time(NULL);
     double duration = difftime(tEnd, tStart);
+    Rate *rate;
+    getCurrentRate(rate);
     // 两分钟内下机不收取费用
     if(duration <= 2 * 60)
     {
         return 0.0;
     }
-    int units = (int)(duration / (UNIT * 60));
+    int units = (int)(duration / (rate->fUnit * 60));
     if(duration > 0 && units == 0)
     {
         units = 1;
     }
-    return units * CHARGE;
+    return units * rate->fCharge;
 }
 
 int doSettle(const char* pName, const char* pPwd, SettleInfo* pInfo)
